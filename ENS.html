@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+<head>
+      <title>ENS</title>
+      <meta charset="utf-8">
+    </head>
+    <body>
+        
+    <h1>Register function</h1>
+    <ol>
+            <p>Address : <input type="text" id="addr1" ></p>
+            <p>Name : <input type="text" id="name1" ></p>
+            <p>결과: <span id="result1"></span></p>
+            <button onclick="Register()">함수호출</button>
+    </ol>
+     
+    <h1>Query address by name </h1>
+    <ol>
+            <p>Name : <input type="text" id="name2" ></p>
+            <p>연결된 주소: <span id="result2"></span></p>
+            <button onclick="query_byName()">함수호출</button> 
+    </ol>
+
+
+    <h1>Query name by address</h1>
+        <ol>
+                <p>Address : <input type="text" id="addr3" ></p>
+                <p>연결된 도메인 이름: <span id="result3"></span></p>
+                <button onclick="query_byAddr()">함수호출</button> 
+        </ol>
+
+
+    <h1>Change address of domain name </h1>
+    <ol>
+            <p>연결 주소를 바꿀 도메인 이름 : <input type="text" id="name4" ></p>
+            <p>바꿀 주소 : <input type="text" id="addr4" ></p>
+            <p>결과: <span id="result4"></span></p>
+            <button onclick="changeAddr()">함수호출</button> 
+    </ol>
+
+    <h1>Transfer ownership of name </h1>
+    <ol>
+            <p>소유권을 넘길 도메인 이름 : <input type="text" id="name5" ></p>
+            <p>소유권을 이전할 주소  : <input type="text" id="addr5" ></p>
+            <p>결과: <span id="result5"></span></p>
+            <button onclick="transferOwnership_ofName()">함수호출</button> 
+    </ol>
+
+    <h1>Withdrawal </h1>
+    <ol>
+            <p>컨트랙트 주소입력 : <input type="text" id="addr6" ></p>
+            <button onclick="withdrawal()">함수호출</button> 
+            <p>결과: <span id="result6"></span></p>
+    </ol>
+
+    <h1>Close </h1>
+    <ol>
+
+        <button onclick="close()">함수호출</button> 
+        <p>결과: <span id="result7"></span></p>
+    </ol>
+   
+    </body>
+
+    <script type="text/javascript">
+    var contractaddress = '0x8122b4b9f4fe6f0b145c2d88493ee19c5f540f01';
+var abi =[
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "Name",
+				"type": "string"
+			},
+			{
+				"name": "Addr",
+				"type": "address"
+			}
+		],
+		"name": "changeAddr",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "Name",
+				"type": "string"
+			}
+		],
+		"name": "query_byName",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "close",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "contractAddr",
+				"type": "address"
+			}
+		],
+		"name": "withdraw",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "Addr",
+				"type": "address"
+			}
+		],
+		"name": "query_byAddr",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "Addr",
+				"type": "address"
+			},
+			{
+				"name": "Name",
+				"type": "string"
+			}
+		],
+		"name": "Register",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"name": "",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "Name",
+				"type": "string"
+			},
+			{
+				"name": "Addr",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership_ofName",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "name",
+				"type": "string"
+			}
+		],
+		"name": "resultName",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "addr",
+				"type": "address"
+			}
+		],
+		"name": "resultAddr",
+		"type": "event"
+	}
+]
+
+var ENScontract ;
+var ENS;
+      window.addEventListener("load", function() {
+    // Checking if Web3 has been injected by the browser (Mist/MetaMask)
+    if (typeof web3 !== "undefined") {
+      // Use Mist/MetaMask's provider
+      window.web3 = new Web3(web3.currentProvider);
+
+    } else {
+      console.log("No web3? You should consider trying MetaMask!");
+      // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
+    }
+    // APP >
+    startApp();
+   
+  });
+
+    function startApp() {
+    
+         ENScontract =web3.eth.contract(abi);
+         ENS = ENScontract.at(contractaddress);
+        
+    }
+
+    function Register() {
+        var addr1 = document.getElementById('addr1').value;
+        var name1 = document.getElementById('name1').value;
+        ENS.Register(addr1,name1,{
+            from: web3.eth.accounts[0],
+            gas: 300000,
+            value: web3.toWei(0.1, "ether")
+        },function(e,r){
+            document.getElementById('result1').innerHTML = r;
+
+        });
+    }
+
+    function query_byName() {
+        var name2 = document.getElementById('name2').value;
+        ENS.query_byName(name2,{
+            from: web3.eth.accounts[0],
+            gas: 300000,
+            value: web3.toWei(0.01, "ether")
+        },function(e,r){
+            if (!e){
+                ENS.resultAddr(function (err, res) {
+    if (!err) {
+        console.log(res.args.addr); 
+        document.getElementById('result2').innerHTML = res.args.addr;// prints 6
+    }
+});
+            }
+        });
+
+    }
+
+    
+
+    function query_byAddr() {
+        var addr3 = document.getElementById('addr3').value;
+        ENS.query_byAddr(addr3,{
+            from: web3.eth.accounts[0],
+            gas: 300000,
+            value: web3.toWei(0.01, "ether")
+        },function(e,r){
+            if (!e){
+                ENS.resultName(function (err, res) {
+    if (!err) {
+        console.log(res.args.addr); 
+        document.getElementById('result3').innerHTML = res.args.name;// prints 6
+    }
+});
+            }
+        });
+
+    }
+
+   
+    
+    function changeAddr() {
+        var name4 = document.getElementById('name4').value;
+        var addr4 = document.getElementById('addr4').value;
+        ENS.changeAddr(name4,addr4, {
+            from: web3.eth.accounts[0],
+            gas: 300000,
+            value: web3.toWei(0.1, "ether")},function(e,r){
+                if(!e)
+                document.getElementById('result4').innerHTML=r;
+                else{
+                    document.getElementById('result4').innerHTML='돈이 부족하거나 Name holder가 아닙니다.';
+                }
+        });
+
+    }
+
+    function transferOwnership_ofName() {
+        var name5 = document.getElementById('name5').value;
+        var addr5 = document.getElementById('addr5').value;
+        ENS.transferOwnership_ofName(name5,addr5, {
+            from: web3.eth.accounts[0],
+            gas: 300000,
+            value: web3.toWei(0.1, "ether")},function(e,r){
+                if(!e)
+                document.getElementById('result5').innerHTML=r;
+                else{
+                    document.getElementById('result5').innerHTML='돈이 부족하거나 Name holder가 아닙니다.';
+                }
+        });
+
+    }
+
+    function close() {
+        ENS.close(function(e,r){
+            if(!e)
+                document.getElementById('result7').innerHTML=r;
+                else{
+                    document.getElementById('result7').innerHTML='돈이 부족하거나 Owner가 아닙니다.';
+                }
+        });
+    }
+
+    function withdrawal() {
+        var addr6 = document.getElementById('addr6').value;
+        ENS.withdraw(addr6, function(e,r){
+            if(!e)
+                document.getElementById('result6').innerHTML=r;
+                else{
+                    document.getElementById('result6').innerHTML='오류발생.';
+                }
+        })
+    }
+    </script>
+
+
+
+
+</html>
